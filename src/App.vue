@@ -2,6 +2,9 @@
 <template>
   <div class="app">
     <h1>nihao</h1>
+    <span class="toutiao toutiao-pinglun"></span>
+    <van-button type="primary">主要按钮</van-button>
+    <div class="box"></div>
   </div>
 </template>
 
@@ -34,4 +37,10 @@ export default {
   activated() {} // 如果页面有keep-alive缓存功能，这个函数会触发
 }
 </script>
-<style scoped lang="less"></style>
+<style scoped lang="less">
+.box {
+  width: 200px;
+  height: 200px;
+  background-color: pink;
+}
+</style>
