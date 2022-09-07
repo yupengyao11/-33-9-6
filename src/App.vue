@@ -1,10 +1,7 @@
 <!--  -->
 <template>
   <div class="app">
-    <h1>nihao</h1>
-    <span class="toutiao toutiao-pinglun"></span>
-    <van-button type="primary">主要按钮</van-button>
-    <div class="box"></div>
+    <router-view></router-view>
   </div>
 </template>
 
