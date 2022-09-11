@@ -1,5 +1,6 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import createPersistedstate from 'vuex-persistedstate'
 
 Vue.use(Vuex)
 
@@ -22,10 +23,24 @@ Vue.use(Vuex)
 // getters的函数 第一个参数是state
 
 export default new Vuex.Store({
+  plugins: [
+    createPersistedstate({
+      key: 'HEIMA_TOUTIAO',
+      storage: window.sessionStorage,
+      reducer(state) {
+        const { tokenObj } = state
+        return { tokenObj }
+      }
+    })
+  ],
   state: {
     tokenObj: {}
   },
-  getters: {},
+  getters: {
+    isLogin(state) {
+      return !!state.tokenObj.token
+    }
+  },
   mutations: {
     SET_TOKEN(state, token) {
       state.tokenObj = token
