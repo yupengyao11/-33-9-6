@@ -31,7 +31,7 @@
 
 <script>
 // 导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
-
+import dayjs from '@/utils/dayjs'
 export default {
   name: 'ArticleItem',
   components: {},
@@ -49,7 +49,7 @@ export default {
     label() {
       /* eslint-disable*/
       const { aut_name, comm_count, pubdate } = this.article
-      return `${aut_name} ${comm_count}评论 ${pubdate}`
+      return `${aut_name} ${comm_count}评论 ${dayjs(pubdate).fromNow()}`
     }
   },
   // 监控data中的数据变化
@@ -58,7 +58,7 @@ export default {
   methods: {},
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    console.log(this.label)
+    // console.log(this.label)
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},

@@ -10,15 +10,107 @@
 
 <body>
 
-    <script>
+    <!-- <script>
         // 让下方代码成立
         let [a, b] = { a: 1, b: 2 }
 
         Object.prototype[Symbol.iterator] = function () {
             return Object.values(this)[Symbol.iterator]()
         }
+    </script> -->
 
+    <script>
+        //手撕promise
+        const PENDING = 'pending'
+        const FUFILLED = 'fufilled'
+        const REJECTED = 'rejected'
 
+        class Promise {
+            value //记录成功的原因
+            reason //失败的原因
+            status = PENDING
+            onFulfilledCallBacks = []
+            onRejectedCallBack = []
+            constructor(executor) {
+                const resolve = (value) => {
+                    if (this.status === PENDING) {
+                        this.value = value
+                        this.status = FUFILLED
+                        this.onFulfilledCallBacks.forEach(cb => cb())
+                    }
+                }
+                const reject = (reason) => {
+                    if (this.status === PENDING) {
+                        this.reason = reason
+                        this.status = REJECTED
+                        this.onRejectedCallBack.forEach(cb => cb())
+                    }
+                }
+                try {
+                    executor(resolve, reject)
+                } catch (error) {
+                    reject
+                        (error)
+                }
+            }
+
+            then(onFulfilled, onRejected) {
+                const p2 = new Promise((resolve, reject) => {
+                    if (this.status === FUFILLED) {
+                        queueMicrotask(() => {
+                            try {
+                                let x = onFulfilled(this.value)
+                                resolve(x)
+                            } catch (error) {
+                                reject(error)
+                            }
+                        })
+                    }
+                    if (this.status === REJECTED) {
+                        queueMicrotask(() => {
+                            try {
+                                let x = onRejected(this.reason)
+                                resolve(x)
+                            } catch (error) {
+                                reject(error)
+                            }
+                        })
+                    }
+                    if (this.status === PENDING) {
+                        // this.onFulfilled = onFulfilled
+                        // this.onRejected = onRejected
+                        this.onFulfilledCallBacks.push(() => {
+                            queueMicrotask(() => {
+                                try {
+                                    let x = onFulfilled(this.value)
+                                    resolve(x)
+                                } catch (error) {
+                                    reject(error)
+                                }
+                            })
+                        })
+                        this.onRejectedCallBack.push(() => {
+                            queueMicrotask(() => {
+                                try {
+                                    let x = onRejected(this.reason)
+                                    resolve(x)
+                                } catch (error) {
+                                    reject(error)
+                                }
+                            })
+                        })
+                    }
+                })
+                return p2
+            }
+        }
+
+        const p = new Promise((resolve, reject) => {
+            reject('失败')
+        })
+        p.then(
+            (res) = console.log(res)
+        )
     </script>
 </body>
 

@@ -14,33 +14,67 @@
         <ArticleList :id="item.id"></ArticleList>
       </van-tab>
 
-      <span class="toutiao toutiao-gengduo"></span>
+      <span class="toutiao toutiao-gengduo" @click="isShow = true"> </span>
     </van-tabs>
+
+    <van-popup
+      v-model="isShow"
+      position="bottom"
+      :style="{ height: '100%' }"
+      closeable
+      close-icon-position="top-left"
+    >
+      <ChannelEdit
+        @change-active=";[(isShow = false), (active = $event)]"
+        :myChannels="channels"
+        @del-channel="delChannel"
+        @add-channel="addChannel"
+      ></ChannelEdit>
+    </van-popup>
   </div>
 </template>
 
 <script>
 // 导入其他文件（比如：组件，工具js，第三方插件js，json文件，图片文件等等）
-import { getChannelAPI } from '@/api'
+import { getChannelAPI, delAllChannelAPI, addAllChannelAPI } from '@/api'
 import ArticleList from './components/AticleList.vue'
+import ChannelEdit from './components/ChannelEdit.vue'
+import { mapGetters, mapMutations } from 'vuex'
 export default {
   name: 'Home',
   components: {
-    ArticleList
+    ArticleList,
+    ChannelEdit
   },
   props: {},
   data() {
     return {
+      isShow: false,
       active: 2,
       channels: []
     }
   },
   // 监听属性 类似于data概念
-  computed: {},
+  computed: {
+    ...mapGetters(['isLogin'])
+  },
   // 监控data中的数据变化
   watch: {},
   // 方法集合
   methods: {
+    ...mapMutations(['SET_MY_CHANNELS']),
+    initChannels() {
+      if (this.isLogin) {
+        this.getChannel()
+      } else {
+        const myChannels = this.$store.state.myChannels
+        if (myChannels.length === 0) {
+          this.getChannel()
+        } else {
+          this.channels = myChannels
+        }
+      }
+    },
     async getChannel() {
       try {
         const { data } = await getChannelAPI()
@@ -53,11 +87,46 @@ export default {
           status === 507 && this.$toast.fail('请刷新')
         }
       }
+    },
+    async delChannel(id) {
+      try {
+        const newChannels = this.channels.filter((item) => item.id !== id)
+        if (this.isLogin) {
+          await delAllChannelAPI(id)
+        } else {
+          this.SET_MY_CHANNELS(newChannels)
+        }
+        this.channels = newChannels
+        this.$toast.success('删除成功～～')
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.$toast.fail('请登录再删除')
+        } else {
+          throw error
+        }
+      }
+    },
+    async addChannel(channel) {
+      try {
+        if (this.isLogin) {
+          await addAllChannelAPI(channel.id, this.channels.length)
+        } else {
+          this.SET_MY_CHANNELS([...this.channels, channel])
+        }
+        this.channels.push(channel)
+        this.$toast.success('添加成功～～')
+      } catch (error) {
+        if (error.response && error.response.status === 401) {
+          this.$toast.fail('请登录再删除')
+        } else {
+          throw error
+        }
+      }
     }
   },
   // 生命周期 - 创建完成（可以访问当前this实例）
   created() {
-    this.getChannel()
+    this.initChannels()
   },
   // 生命周期 - 挂载完成（可以访问DOM元素）
   mounted() {},

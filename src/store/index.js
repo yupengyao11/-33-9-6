@@ -26,15 +26,16 @@ export default new Vuex.Store({
   plugins: [
     createPersistedstate({
       key: 'HEIMA_TOUTIAO',
-      storage: window.sessionStorage,
+      // storage: window.sessionStorage,
       reducer(state) {
-        const { tokenObj } = state
-        return { tokenObj }
+        const { tokenObj, myChannels } = state
+        return { tokenObj, myChannels }
       }
     })
   ],
   state: {
-    tokenObj: {}
+    tokenObj: {},
+    myChannels: []
   },
   getters: {
     isLogin(state) {
@@ -44,6 +45,9 @@ export default new Vuex.Store({
   mutations: {
     SET_TOKEN(state, token) {
       state.tokenObj = token
+    },
+    SET_MY_CHANNELS(state, channels) {
+      state.myChannels = channels
     }
   }
 })
