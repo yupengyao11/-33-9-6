@@ -3,7 +3,12 @@
   <div class="home">
     <van-nav-bar class="navbar">
       <template #title>
-        <van-button class="van-button--block" round icon="search" size="small"
+        <van-button
+          class="van-button--block"
+          round
+          icon="search"
+          size="small"
+          to="/search"
           >搜索</van-button
         >
       </template>
